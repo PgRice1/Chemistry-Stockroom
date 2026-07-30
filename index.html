@@ -46,9 +46,55 @@
 
         button { font-family: inherit; }
 
+        /* WCAG 2.4.7 Focus Visible (AA): a strong, consistent focus indicator on
+           every interactive control. A dark ring plus a white halo guarantees
+           visibility on both light panels and the dark header, and it stays
+           visible in Windows High Contrast mode via the forced-colors block. */
         :focus-visible {
-            outline: 2px solid var(--rice-blue-2);
+            outline: 3px solid var(--rice-blue-2);
             outline-offset: 2px;
+            border-radius: 3px;
+        }
+
+        .category-chip:focus-visible,
+        .result-item:focus-visible,
+        #mapAllBtn:focus-visible,
+        .list-backbar:focus-visible,
+        #resetBtn:focus-visible,
+        .zoom-controls button:focus-visible,
+        .location-chip button:focus-visible,
+        #clearSearchBtn:focus-visible,
+        #searchInput:focus-visible {
+            outline: 3px solid var(--rice-blue-2);
+            outline-offset: 2px;
+            box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.9);
+        }
+
+        /* Controls sitting on the dark header get a light ring for contrast */
+        #resetBtn:focus-visible,
+        #clearSearchBtn:focus-visible,
+        #searchInput:focus-visible {
+            outline-color: #fff;
+            box-shadow: 0 0 0 5px rgba(0, 32, 91, 0.55);
+        }
+
+        /* Windows High Contrast / forced-colors: keep focus + key borders visible */
+        @media (forced-colors: active) {
+            :focus-visible,
+            .category-chip:focus-visible,
+            .result-item:focus-visible,
+            #mapAllBtn:focus-visible,
+            #searchInput:focus-visible {
+                outline: 3px solid Highlight;
+                box-shadow: none;
+            }
+            .result-item.active { outline: 2px solid Highlight; outline-offset: -2px; }
+            svg.highlight-layer .highlighted-location rect,
+            svg.highlight-layer .highlighted-location path:not(.no-outline),
+            svg.highlight-layer .highlighted-location polygon,
+            svg.highlight-layer .highlighted-location circle {
+                stroke: Highlight !important;
+            }
         }
 
         /* ================= SIDEBAR ================= */
@@ -85,18 +131,32 @@
             letter-spacing: 0.14em;
             text-transform: uppercase;
             color: var(--sky);
-            margin-bottom: 4px;
+            margin: 0 0 4px;
         }
 
-        .sidebar-header h1 {
-            margin: 0 0 16px 0;
-            font-size: 1.35rem;
-            font-weight: 700;
-            letter-spacing: 0.01em;
+        .title-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 12px;
+            margin: 0 0 14px;
+        }
+
+        .sidebar-header h1 {
+            margin: 0;
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+        }
+
+        .search-label {
+            display: block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--sky);
+            margin: 0 0 6px 2px;
         }
 
         #resetBtn {
@@ -136,6 +196,8 @@
         }
 
         #searchInput::placeholder { color: rgba(255,255,255,0.65); }
+
+        #searchInput::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
 
         #searchInput:focus {
             background: #fff;
@@ -259,9 +321,21 @@
         }
         .results-container::-webkit-scrollbar-track { background: transparent; }
 
+        /* Result rows are real <button>s inside <li>s for correct list semantics
+           and native keyboard support. Reset button chrome, keep row layout. */
+        .result-listing { list-style: none; margin: 0; padding: 0; }
+        .result-row { margin: 0; padding: 0; }
+
         .result-item {
-            padding: 14px 22px 14px 22px;
+            display: block;
+            width: 100%;
+            text-align: left;
+            font-family: inherit;
+            color: inherit;
+            background: transparent;
+            border: none;
             border-bottom: 1px solid var(--line);
+            padding: 14px 22px 14px 22px;
             cursor: pointer;
             transition: background .12s ease;
             position: relative;
@@ -276,6 +350,13 @@
             left: 0; top: 0; bottom: 0;
             width: 4px;
             background: var(--rice-blue-2);
+        }
+
+        /* Non-colour cue for the selected row (WCAG 1.4.1): a leading marker
+           on the ID, so selection is conveyed by more than background colour. */
+        .result-item.active .item-id::before {
+            content: '\25B8\00A0'; /* ▸ */
+            color: var(--rice-blue-2);
         }
 
         .item-header {
@@ -320,6 +401,9 @@
             border-radius: 2px;
             padding: 0 1px;
         }
+
+        .result-item--static { cursor: default; }
+        .result-item--static:hover { background: transparent; }
 
         .truncation-note {
             padding: 14px 22px;
@@ -585,12 +669,8 @@
             border: 0;
         }
 
-        /* Keyboard focus ring on result rows */
-        .result-item:focus-visible {
-            outline: 2px solid var(--rice-blue-2);
-            outline-offset: -2px;
-            background: var(--card-active);
-        }
+        /* Keyboard focus ring on result rows is handled by the global
+           :focus-visible rules above. */
 
         /* ================= LANDING / CATEGORY BROWSER ================= */
         .landing {
@@ -686,12 +766,16 @@
         /* Back link shown atop category/browse result lists */
         .list-backbar {
             display: none;
+            width: 100%;
+            text-align: left;
             align-items: center;
             gap: 7px;
             padding: 9px 22px;
             background: #fff;
+            border: none;
             border-bottom: 1px solid var(--line);
             cursor: pointer;
+            font-family: inherit;
             font-size: 0.8rem;
             font-weight: 600;
             color: var(--rice-blue-2);
@@ -729,34 +813,35 @@
 </head>
 <body>
 
-    <aside class="sidebar" aria-label="Stockroom catalogue search">
+    <aside class="sidebar" aria-labelledby="sidebarTitle">
         <header class="sidebar-header">
-            <div class="brand-eyebrow">Rice University &middot; Department of Chemistry</div>
-            <h1>
-                Stockroom Catalogue
-                <button id="resetBtn" title="Clear search and map selection">Reset</button>
-            </h1>
+            <p class="brand-eyebrow">Rice University &middot; Department of Chemistry</p>
+            <div class="title-row">
+                <h1 id="sidebarTitle">Stockroom Catalogue</h1>
+                <button id="resetBtn" type="button" title="Clear search and map selection">Reset</button>
+            </div>
+            <label class="search-label" for="searchInput">Search the catalogue</label>
             <div class="search-container">
-                <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
-                <input type="text" id="searchInput" placeholder="Search for an item, ID, or location&hellip;" autocomplete="off" spellcheck="false"
-                       role="searchbox" aria-label="Search the stockroom catalogue" aria-controls="resultsList" aria-describedby="searchHint">
-                <button id="clearSearchBtn" title="Clear search" aria-label="Clear search">&#10005;</button>
+                <input type="search" id="searchInput" placeholder="e.g. tape, 10275, or A05&hellip;" autocomplete="off" spellcheck="false"
+                       aria-controls="resultsList" aria-describedby="searchHint">
+                <button id="clearSearchBtn" type="button" title="Clear search" aria-label="Clear search"><span aria-hidden="true">&#10005;</span></button>
                 <span class="search-kbd" aria-hidden="true">/</span>
             </div>
-            <span id="searchHint" class="sr-only">Type to search by item name, catalog number, or location. Press Enter to highlight every matching location on the map. Use the arrow keys to move through results and Enter on a result to show just that location.</span>
+            <span id="searchHint" class="sr-only">Search by item name, catalog number, or location. Press Enter to highlight every matching location on the map. Use the arrow keys to move through results and Enter on a result to show just that location.</span>
         </header>
         <div id="viewTitleBar" class="view-title">
             <span id="viewTitle">Search Results</span>
-            <button id="mapAllBtn" title="Highlight every matching location on the map">Map all</button>
+            <button id="mapAllBtn" type="button" title="Highlight every matching location on the map">Map all</button>
         </div>
-        <div id="listBackBar" class="list-backbar" role="button" tabindex="0">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        <button id="listBackBar" class="list-backbar" type="button">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 18 9 12 15 6"></polyline></svg>
             Back to categories
-        </div>
-        <ul class="results-container" id="resultsList" role="list" aria-label="Search results"></ul>
+        </button>
+        <div class="results-container" id="resultsList"></div>
         <p id="liveRegion" class="sr-only" role="status" aria-live="polite"></p>
         <footer class="sidebar-footer">
             <span id="statsItems"></span>
@@ -766,7 +851,9 @@
 
     <main class="map-container" id="mapContainer">
         <div id="mapSvgContainer">
-            <svg width="800" height="800" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="800" height="800" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="mapTitle mapDesc">
+            <title id="mapTitle">Chemistry stockroom floor plan</title>
+            <desc id="mapDesc">Interactive floor plan showing storage shelves, cabinets and locations. To find and highlight a location, search or browse the catalogue in the panel on the left and select an item; matching shelves are highlighted here.</desc>
             <g id="Frame 1">
             <g id="Floor">
             <g id="Stockroom 3">
@@ -1330,22 +1417,22 @@
 
         <div class="map-chrome location-chip" id="locationChip">
             <span id="locationChipText"></span>
-            <button id="locationChipClear" title="Clear selection" aria-label="Clear selection">&#10005;</button>
+            <button id="locationChipClear" type="button" title="Clear selection" aria-label="Clear selection"><span aria-hidden="true">&#10005;</span></button>
         </div>
 
         <div class="map-chrome map-hint">
             <b>Scroll</b> to zoom &nbsp;&middot;&nbsp; <b>Drag</b> to pan &nbsp;&middot;&nbsp; <b>Click</b> a shelf for contents
         </div>
 
-        <div class="map-chrome zoom-controls">
-            <button id="zoomInBtn" title="Zoom in" aria-label="Zoom in">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <div class="map-chrome zoom-controls" role="group" aria-label="Map zoom">
+            <button id="zoomInBtn" type="button" title="Zoom in" aria-label="Zoom in">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" focusable="false"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </button>
-            <button id="zoomOutBtn" title="Zoom out" aria-label="Zoom out">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <button id="zoomOutBtn" type="button" title="Zoom out" aria-label="Zoom out">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" focusable="false"><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </button>
-            <button id="zoomFitBtn" title="Fit to view" aria-label="Fit to view">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+            <button id="zoomFitBtn" type="button" title="Fit to view" aria-label="Fit to view">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
             </button>
         </div>
     </main>
@@ -2509,12 +2596,19 @@
 
         // Landing screen: friendly intro for customers + a browsable category grid
         function renderLanding() {
-            const chips = topCategories.map(c => `
-                <button class="category-chip" data-cat="${escapeHtml(c.name)}"
-                        aria-label="Browse ${escapeHtml(c.name.toLowerCase())} — ${c.count} item${c.count === 1 ? '' : 's'}">
-                    <span class="cat-label">${escapeHtml(toTitle(c.name))}</span>
-                    <span class="cat-count">${c.count}</span>
-                </button>`).join('');
+            // aria-label must CONTAIN the visible label text (WCAG 2.5.3): each
+            // chip's visible words are the Title-case category name and the count,
+            // so we build the accessible name from those exact tokens.
+            const chips = topCategories.map(c => {
+                const title = toTitle(c.name);
+                const label = `${title}, ${c.count} item${c.count === 1 ? '' : 's'}`;
+                return `
+                <button class="category-chip" type="button" data-cat="${escapeHtml(c.name)}"
+                        aria-label="${escapeHtml(label)}">
+                    <span class="cat-label">${escapeHtml(title)}</span>
+                    <span class="cat-count" aria-hidden="true">${c.count}</span>
+                </button>`;
+            }).join('');
 
             resultsList.innerHTML = `
                 <div class="landing">
@@ -2522,11 +2616,11 @@
                     Search to check whether we carry an item and find exactly where it lives.</p>
                     <p class="landing-sub">Type an item name, catalog number, or location above &mdash;
                     tap a shelf on the map to see what&rsquo;s on it &mdash; or browse a category below.</p>
-                    <p class="browse-heading">Browse by category</p>
+                    <h2 class="browse-heading">Browse by category</h2>
                     <div class="category-grid" id="categoryGrid">
                         ${chips}
-                        <button class="category-chip all-items" data-cat="__ALL__"
-                                aria-label="Browse the full catalogue, all ${inventory.length} items">
+                        <button class="category-chip all-items" type="button" data-cat="__ALL__"
+                                aria-label="View the full catalogue, all ${inventory.length} items">
                             View the full catalogue &rarr;
                         </button>
                     </div>
@@ -2901,7 +2995,7 @@
             }
 
             if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-                const rows = [...resultsList.querySelectorAll('.result-item')];
+                const rows = [...resultsList.querySelectorAll('button.result-item')];
                 if (rows.length === 0) return;
                 const active = document.activeElement;
                 const inList = active && active.classList.contains('result-item');
@@ -2989,9 +3083,6 @@
         }
 
         listBackBar.addEventListener('click', renderLanding_reset);
-        listBackBar.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); renderLanding_reset(); }
-        });
 
         // Return to the category landing without wiping the whole view chrome
         function renderLanding_reset() {
@@ -3056,8 +3147,13 @@
         function renderList(items, interactive, tokens) {
             tokens = tokens || [];
             resultsList.innerHTML = '';
-            const fragment = document.createDocumentFragment();
             const renderItems = items.slice(0, MAX_RENDERED_RESULTS);
+
+            // Real <ul> of <li> listitems; each interactive row is a native
+            // <button> inside its <li> (correct list semantics + keyboard support)
+            const ul = document.createElement('ul');
+            ul.className = 'result-listing';
+            ul.setAttribute('aria-label', interactive ? 'Results — select to show on the map' : 'Items at this location');
 
             renderItems.forEach(item => {
                 let displayLoc = item.location;
@@ -3074,9 +3170,9 @@
                 }
 
                 const li = document.createElement('li');
-                li.className = 'result-item';
+                li.className = 'result-row';
 
-                li.innerHTML = `
+                const rowInner = `
                     <div class="item-header">
                         <span class="item-id">${markTokens(escapeHtml(item.itemNumber), tokens)}</span>
                         <span class="item-location">${markTokens(escapeHtml(displayLoc), tokens)}</span>
@@ -3085,13 +3181,15 @@
                 `;
 
                 if (interactive) {
-                    // Full keyboard + screen-reader support: each row is a button
-                    li.setAttribute('role', 'button');
-                    li.setAttribute('tabindex', '0');
-                    li.setAttribute('aria-label',
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'result-item';
+                    btn.innerHTML = rowInner;
+                    btn.setAttribute('aria-label',
                         `${item.description}. Item ${item.itemNumber}. Location ${displayLoc}. Show on map.`);
 
-                    const activate = () => {
+                    // Native <button> handles Enter/Space and click for us
+                    btn.addEventListener('click', () => {
                         // Highlight the map first: clearHighlight() inside it also
                         // clears the previous active row, so set ours afterwards.
                         if (logicalId) {
@@ -3099,24 +3197,24 @@
                             if (nonShelfLabels[logicalId]) chipName = `${logicalId} - ${nonShelfLabels[logicalId]}`;
                             highlightLocationOnMap(logicalId, chipName);
                         }
-                        li.classList.add('active');
-                        activeListItem = li;
-                    };
-
-                    li.addEventListener('click', activate);
-                    li.addEventListener('keydown', (e) => {
-                        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
+                        btn.classList.add('active');
+                        activeListItem = btn;
                     });
+                    li.appendChild(btn);
+                } else {
+                    // Shelf-contents view: static rows (the title names the shelf)
+                    const div = document.createElement('div');
+                    div.className = 'result-item result-item--static';
+                    div.innerHTML = rowInner;
+                    li.appendChild(div);
                 }
-                // Shelf-contents view: rows render unhighlighted — the view title
-                // already says which shelf they belong to.
-                fragment.appendChild(li);
+                ul.appendChild(li);
             });
 
-            resultsList.appendChild(fragment);
+            resultsList.appendChild(ul);
 
             if (items.length > MAX_RENDERED_RESULTS) {
-                const note = document.createElement('div');
+                const note = document.createElement('p');
                 note.className = 'truncation-note';
                 const advice = (tokens && tokens.length)
                     ? 'add another word to narrow the search.'
