@@ -459,6 +459,91 @@
             justify-content: space-between;
         }
 
+        /* ---- Persistent Contacts button (always available, like the map POS) ---- */
+        .contacts-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 11px 22px;
+            border: none;
+            border-top: 1px solid var(--line);
+            background: #fff;
+            color: var(--rice-blue-2);
+            font-family: var(--font-ui);
+            font-size: 0.86rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background .12s ease, color .12s ease;
+        }
+
+        .contacts-btn:hover { background: var(--rice-blue-2); color: #fff; }
+        .contacts-btn svg { flex-shrink: 0; }
+
+        @media (pointer: coarse) { .contacts-btn { padding: 15px 22px; } }
+
+        /* ---- Contacts panel (shown when the Office is selected) ---- */
+        .contacts-panel { padding: 20px 22px 26px; }
+
+        .contacts-title {
+            margin: 0 0 6px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--rice-blue-2);
+        }
+
+        .contacts-intro {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #4a5560;
+            margin: 0 0 18px;
+        }
+
+        .contact-card {
+            border: 1px solid var(--line);
+            border-radius: 11px;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+            background: #fff;
+        }
+
+        .contact-card h3 {
+            margin: 0 0 2px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--rice-blue);
+        }
+
+        .contact-role {
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--rice-blue-2);
+            margin: 0 0 10px;
+        }
+
+        .contact-line {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 0.88rem;
+            margin-top: 6px;
+        }
+
+        .contact-line svg { flex-shrink: 0; color: var(--muted); }
+
+        .contact-line a {
+            color: var(--rice-blue-2);
+            text-decoration: none;
+            word-break: break-word;
+        }
+
+        .contact-line a:hover { text-decoration: underline; }
+
         /* ================= MAP AREA ================= */
         .map-container {
             flex: 1;
@@ -843,6 +928,10 @@
         </button>
         <div class="results-container" id="resultsList"></div>
         <p id="liveRegion" class="sr-only" role="status" aria-live="polite"></p>
+        <button id="contactsBtn" class="contacts-btn" type="button">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            Contacts &amp; Office
+        </button>
         <footer class="sidebar-footer">
             <span id="statsItems"></span>
             <span id="statsLocations"></span>
@@ -2444,6 +2533,7 @@
             'HDAHDB - Swagelok': 'HDAHDB',
             'POS 1': 'POS 1',
             'POS 2': 'POS 2',
+            'Office': 'OFFICE',
             'A19 - Liquid Nitrogen': 'N2',
             'A16 - Dry Ice': 'CO2',
             '#7 - Catalogue': '#7',
@@ -2465,7 +2555,8 @@
             '#4': 'Glass Waste',
             '#5': 'Safety Shower',
             '#6': 'Sink',
-            '#7': 'Catalogue'
+            '#7': 'Catalogue',
+            'OFFICE': 'Office'
         };
 
         // Fixed stockroom features that never hold inventory items:
@@ -2479,6 +2570,13 @@
             'POS 1': 'Point of Sale Station 1',
             'POS 2': 'Point of Sale Station 2'
         };
+
+        // ---- Stockroom points of contact (shown when the Office is selected) ----
+        const CONTACTS = [
+            { name: 'Javier Chavez', title: 'Stockroom Manager',      email: 'jjc5@rice.edu', office: 'SST 113B' },
+            { name: 'Sydney Kolar', title: 'Stockroom Accountant',  email: 'sak12@rice.edu', office: 'SST 113B' },
+            { name: 'Israel Ramirez Jr.', title: 'Shipping and Receiving Coordinator', email: 'ir28@rice.edu', office: 'SST 100' }
+        ];
 
         function getLogicalSvgId(rawId) {
             if (!rawId) return '';
@@ -2583,6 +2681,11 @@
                 .replace(/"/g, '&quot;');
         }
 
+        // For values placed inside quoted HTML attributes (e.g. href)
+        function escapeAttr(str) {
+            return escapeHtml(str).replace(/'/g, '&#39;');
+        }
+
         // Wrap matched search tokens in <mark> (operates on escaped text)
         function markTokens(escapedText, tokens) {
             if (!tokens || tokens.length === 0) return escapedText;
@@ -2619,18 +2722,12 @@
                     <h2 class="browse-heading">Browse by category</h2>
                     <div class="category-grid" id="categoryGrid">
                         ${chips}
-                        <button class="category-chip all-items" type="button" data-cat="__ALL__"
-                                aria-label="View the full catalogue, all ${inventory.length} items">
-                            View the full catalogue &rarr;
-                        </button>
                     </div>
                 </div>`;
 
             resultsList.querySelectorAll('.category-chip').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    const cat = btn.getAttribute('data-cat');
-                    if (cat === '__ALL__') showCategory('__ALL__');
-                    else showCategory(cat);
+                    showCategory(btn.getAttribute('data-cat'));
                 });
             });
         }
@@ -2892,6 +2989,15 @@
                     element.addEventListener('click', (e) => {
                         if (isMapDragging) return;
                         e.stopPropagation();
+
+                        // The Office is the contacts location, not an inventory shelf
+                        if (logicalId === 'OFFICE') {
+                            searchInput.value = '';
+                            clearSearchBtn.style.display = 'none';
+                            openContacts();
+                            return;
+                        }
+
                         searchInput.value = '';
                         clearSearchBtn.style.display = 'none';
 
@@ -2909,8 +3015,12 @@
             });
 
             if (svgContainer) {
+                // Tapping empty map space only DESELECTS the current location — it
+                // no longer wipes the search. On a tablet, dismissing the on-screen
+                // keyboard with a tap must not throw away what was typed.
                 svgContainer.addEventListener('click', () => {
-                    if (!isMapDragging) resetView();
+                    if (isMapDragging) return;
+                    if (currentlyHighlighted.length) clearHighlight();
                 });
             }
         }
@@ -3031,16 +3141,9 @@
             clearSearchBtn.style.display = 'none';
             currentSearchTokens = [];
 
-            let items, title;
-            if (catName === '__ALL__') {
-                items = [...inventory];
-                title = `Full Catalogue (${items.length.toLocaleString()} items)`;
-                cameFromCategory = '__ALL__';
-            } else {
-                items = (categoryIndex.get(catName) || []).slice();
-                title = `${toTitle(catName)} (${items.length} item${items.length === 1 ? '' : 's'})`;
-                cameFromCategory = catName;
-            }
+            const items = (categoryIndex.get(catName) || []).slice();
+            const title = `${toTitle(catName)} (${items.length} item${items.length === 1 ? '' : 's'})`;
+            cameFromCategory = catName;
 
             items.sort((a, b) =>
                 a.description.localeCompare(b.description, undefined, { numeric: true }));
@@ -3051,7 +3154,7 @@
             listBackBar.style.display = 'flex';
 
             currentListItems = items;
-            currentListLabel = (catName === '__ALL__') ? 'full catalogue' : toTitle(catName);
+            currentListLabel = toTitle(catName);
             mapAllBtn.style.display = 'block';
 
             renderList(items, true, []);
@@ -3101,6 +3204,54 @@
         }
 
         // ==================== DISPLAY LOGIC ====================
+        // Contacts: highlight the Office on the map and list the points of contact.
+        // Reachable two ways (like the POS stations): the sidebar Contacts button
+        // and clicking the Office on the map.
+        function openContacts() {
+            const OFFICE = 'OFFICE';
+            cameFromCategory = null;
+            currentSearchTokens = [];
+            currentListItems = [];
+            searchInput.value = '';
+            clearSearchBtn.style.display = 'none';
+
+            highlightLocationOnMap(OFFICE, 'Office');
+
+            viewTitleBar.style.display = 'flex';
+            viewTitle.textContent = 'Office \u00B7 Contacts';
+            mapAllBtn.style.display = 'none';
+            listBackBar.style.display = 'none';
+            resetBtn.style.display = 'block';
+
+            const mailIcon = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m22 7-10 5L2 7"></path></svg>`;
+            const phoneIcon = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>`;
+
+            const cards = CONTACTS.map(c => {
+                const telHref = 'tel:' + c.phone.replace(/[^0-9+]/g, '');
+                return `
+                    <div class="contact-card">
+                        <h3>${escapeHtml(c.name)}</h3>
+                        <p class="contact-role">${escapeHtml(c.title)}</p>
+                        <p class="contact-line">${mailIcon}
+                            <a href="mailto:${escapeAttr(c.email)}">${escapeHtml(c.email)}</a></p>
+                        <p class="contact-line">${phoneIcon}
+                            <a href="${escapeAttr(telHref)}">${escapeHtml(c.phone)}</a></p>
+                    </div>`;
+            }).join('');
+
+            resultsList.innerHTML = `
+                <div class="contacts-panel">
+                    <h2 class="contacts-title">Points of contact</h2>
+                    <p class="contacts-intro">The stockroom office is highlighted on the map.
+                    Reach the team using the contacts below.</p>
+                    ${cards}
+                </div>`;
+            resultsList.scrollTop = 0;
+            announce(`Office highlighted on the map. Showing ${CONTACTS.length} stockroom contacts.`);
+        }
+
+        document.getElementById('contactsBtn').addEventListener('click', openContacts);
+
         function displayShelfContents(logicalId, displayName) {
             const shelfItems = inventory.filter(item => getItemLogicalId(item) === logicalId);
 
