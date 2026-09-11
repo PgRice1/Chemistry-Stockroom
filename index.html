@@ -8,10 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
     <style>
-        /* ============================================================
-           RICE BRAND TOKENS
-           Rice Blue #00205B · Brand Blue #0A509E · Rice Gray #7C7E7F
-           ============================================================ */
+        
         :root {
             --rice-blue: #00205B;
             --rice-blue-2: #0A509E;
@@ -46,10 +43,6 @@
 
         button { font-family: inherit; }
 
-        /* WCAG 2.4.7 Focus Visible (AA): a strong, consistent focus indicator on
-           every interactive control. A dark ring plus a white halo guarantees
-           visibility on both light panels and the dark header, and it stays
-           visible in Windows High Contrast mode via the forced-colors block. */
         :focus-visible {
             outline: 3px solid var(--rice-blue-2);
             outline-offset: 2px;
@@ -70,7 +63,6 @@
             box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.9);
         }
 
-        /* Controls sitting on the dark header get a light ring for contrast */
         #resetBtn:focus-visible,
         #clearSearchBtn:focus-visible,
         #searchInput:focus-visible {
@@ -78,7 +70,6 @@
             box-shadow: 0 0 0 5px rgba(0, 32, 91, 0.55);
         }
 
-        /* Windows High Contrast / forced-colors: keep focus + key borders visible */
         @media (forced-colors: active) {
             :focus-visible,
             .category-chip:focus-visible,
@@ -97,7 +88,6 @@
             }
         }
 
-        /* ================= SIDEBAR ================= */
         .sidebar {
             width: 400px;
             min-width: 400px;
@@ -116,7 +106,6 @@
             z-index: 2;
         }
 
-        /* Hairline sky-blue rule anchoring the brand block */
         .sidebar-header::after {
             content: '';
             position: absolute;
@@ -321,8 +310,6 @@
         }
         .results-container::-webkit-scrollbar-track { background: transparent; }
 
-        /* Result rows are real <button>s inside <li>s for correct list semantics
-           and native keyboard support. Reset button chrome, keep row layout. */
         .result-listing { list-style: none; margin: 0; padding: 0; }
         .result-row { margin: 0; padding: 0; }
 
@@ -352,8 +339,6 @@
             background: var(--rice-blue-2);
         }
 
-        /* Non-colour cue for the selected row (WCAG 1.4.1): a leading marker
-           on the ID, so selection is conveyed by more than background colour. */
         .result-item.active .item-id::before {
             content: '\25B8\00A0'; /* ▸ */
             color: var(--rice-blue-2);
@@ -459,7 +444,6 @@
             justify-content: space-between;
         }
 
-        /* ---- Persistent Contacts button (always available, like the map POS) ---- */
         .contacts-btn {
             display: flex;
             align-items: center;
@@ -483,7 +467,6 @@
 
         @media (pointer: coarse) { .contacts-btn { padding: 15px 22px; } }
 
-        /* ---- Contacts panel (shown when the Office is selected) ---- */
         .contacts-panel { padding: 20px 22px 26px; }
 
         .contacts-title {
@@ -544,13 +527,10 @@
 
         .contact-line a:hover { text-decoration: underline; }
 
-        /* ================= MAP AREA ================= */
         .map-container {
             flex: 1;
             position: relative;
             overflow: hidden;
-            /* Flat surface color; the SVG's cover pieces are painted this exact
-               color so thresholds and edges blend seamlessly at any position. */
             background: #EAEFF6;
         }
 
@@ -582,15 +562,12 @@
             filter: drop-shadow(0 2px 5px rgba(0, 32, 91, 0.35)) !important;
         }
 
-        /* --- HIGH-PERFORMANCE MAP HIGHLIGHTING (clone-layer) --- */
         svg.main-map { transition: opacity 0.4s ease; }
         svg.main-map.map-is-active { opacity: 0.30; }
 
         svg.highlight-layer { z-index: 10; }
         svg.highlight-layer * { visibility: hidden; }
 
-        /* The overlay is display-only: clicks must always pass through to the
-           main map so a new shelf can be selected without clicking off first */
         svg.highlight-layer,
         svg.highlight-layer * {
             pointer-events: none !important;
@@ -601,7 +578,6 @@
             visibility: visible !important;
         }
 
-        /* Borders & shadow ONLY on structural shapes, bypassing letterforms */
         svg.highlight-layer .highlighted-location rect,
         svg.highlight-layer .highlighted-location path:not(.no-outline),
         svg.highlight-layer .highlighted-location polygon,
@@ -626,14 +602,12 @@
             }
         }
 
-        /* Vector-text curves never receive outlines or thickness distortion */
         svg.highlight-layer .highlighted-location path.no-outline {
             stroke: none !important;
             filter: none !important;
             animation: none !important;
         }
 
-        /* Text highlighting (with exemption for CO2 and N2) */
         svg.highlight-layer .highlighted-location:not(.no-bold-text) text,
         svg.highlight-layer .highlighted-location:not(.no-bold-text) tspan,
         svg.highlight-layer text.highlighted-location:not(.no-bold-text),
@@ -651,7 +625,6 @@
             font-weight: normal !important;
         }
 
-        /* ---- Floating map furniture ---- */
         .map-chrome {
             position: absolute;
             z-index: 20;
@@ -742,8 +715,6 @@
 
         .location-chip button:hover { background: rgba(255,255,255,0.35); }
 
-        /* ================= ACCESSIBILITY ================= */
-        /* Visually hidden but available to screen readers */
         .sr-only {
             position: absolute;
             width: 1px; height: 1px;
@@ -754,10 +725,6 @@
             border: 0;
         }
 
-        /* Keyboard focus ring on result rows is handled by the global
-           :focus-visible rules above. */
-
-        /* ================= LANDING / CATEGORY BROWSER ================= */
         .landing {
             padding: 30px 22px 26px;
         }
@@ -848,7 +815,6 @@
             border-style: dashed;
         }
 
-        /* Back link shown atop category/browse result lists */
         .list-backbar {
             display: none;
             width: 100%;
@@ -869,7 +835,6 @@
         .list-backbar:hover { background: var(--card-hover); }
         .list-backbar svg { flex-shrink: 0; }
 
-        /* ================= TABLET / TOUCH ================= */
         @media (pointer: coarse) {
             .result-item { padding-top: 16px; padding-bottom: 16px; }
             .zoom-controls button { width: 46px; height: 46px; }
@@ -878,7 +843,6 @@
             .location-chip button { width: 26px; height: 26px; }
         }
 
-        /* ---- Small screens: stack panels ---- */
         @media (max-width: 820px) {
             body { flex-direction: column; }
             .sidebar {
@@ -2475,7 +2439,6 @@
 67290,"UNION, BRASS, REDUCING, 3/8"" TUBE X 1/4"" TUBE",HDB-086
 </script>
 <script>
-        // ==================== CSV PARSER ====================
         function parseCSV(text) {
             const result = [];
             const lines = text.split(/\r?\n/);
@@ -2518,7 +2481,6 @@
             return result;
         }
 
-        // ==================== CUSTOM MAPPING DICTIONARIES ====================
         const customItemMapping = {
             '10215': '#1',
             '10240': '#2',
@@ -2559,8 +2521,6 @@
             'OFFICE': 'Office'
         };
 
-        // Fixed stockroom features that never hold inventory items:
-        // clicking them shows a description card instead of "no items"
         const fixedLocationDescriptions = {
             '#3': 'Drill Press and Scale',
             '#4': 'Glass Waste',
@@ -2571,7 +2531,6 @@
             'POS 2': 'Point of Sale Station 2'
         };
 
-        // ---- Stockroom points of contact (shown when the Office is selected) ----
         const CONTACTS = [
             { name: 'Javier Chavez', title: 'Stockroom Manager',      email: 'jjc5@rice.edu', office: 'SST 113B' },
             { name: 'Sydney Kolar', title: 'Stockroom Accountant',  email: 'sak12@rice.edu', office: 'SST 113B' },
@@ -2610,7 +2569,6 @@
             return prefix;
         }
 
-        // ==================== GLOBALS ====================
         const searchInput = document.getElementById('searchInput');
         const clearSearchBtn = document.getElementById('clearSearchBtn');
         const resultsList = document.getElementById('resultsList');
@@ -2625,18 +2583,17 @@
         const svgMapElements = new Map();
 
         const MAX_RENDERED_RESULTS = 250;
-        const TOP_CATEGORY_COUNT = 24; // categories shown on the landing screen
+        const TOP_CATEGORY_COUNT = 24; 
 
         let currentlyHighlighted = [];
         let activeListItem = null;
         let isMapDragging = false;
         let highlightOverlaySvg = null;
         let currentSearchTokens = [];
-        let cameFromCategory = null; // remembers which category a list was opened from
-        let currentListItems = [];   // items behind the visible list (for "Map all")
-        let currentListLabel = '';   // short label for the multi-highlight chip
+        let cameFromCategory = null;
+        let currentListItems = [];
+        let currentListLabel = '';
 
-        // ==================== LOAD DATA ====================
         const rawCSVText = document.getElementById('csvDataBlock').textContent;
         const inventory = parseCSV(rawCSVText);
 
@@ -2646,11 +2603,7 @@
             if (logicalId) activeShelves.add(logicalId);
         });
 
-        // ==================== CATEGORY INDEX ====================
-        // No category column exists, but every description leads with a product
-        // type ("FLASK, ...", "BOTTLE, ..."). Grouping on that first token turns
-        // the list into a browsable high-level catalogue.
-        const categoryIndex = new Map(); // NAME -> [items]
+        const categoryIndex = new Map();
         inventory.forEach(item => {
             if (!item.description) return;
             let type = item.description.split(',')[0].trim().toUpperCase();
@@ -2660,7 +2613,6 @@
             categoryIndex.get(type).push(item);
         });
 
-        // Categories sorted by how many items they hold (most stocked first)
         const topCategories = [...categoryIndex.entries()]
             .sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]))
             .slice(0, TOP_CATEGORY_COUNT)
@@ -2668,11 +2620,9 @@
 
         function announce(msg) {
             liveRegion.textContent = '';
-            // Reassigning on next tick forces screen readers to re-announce
             window.setTimeout(() => { liveRegion.textContent = msg; }, 30);
         }
 
-        // ==================== UTILITIES ====================
         function escapeHtml(str) {
             return String(str)
                 .replace(/&/g, '&amp;')
@@ -2681,12 +2631,10 @@
                 .replace(/"/g, '&quot;');
         }
 
-        // For values placed inside quoted HTML attributes (e.g. href)
         function escapeAttr(str) {
             return escapeHtml(str).replace(/'/g, '&#39;');
         }
 
-        // Wrap matched search tokens in <mark> (operates on escaped text)
         function markTokens(escapedText, tokens) {
             if (!tokens || tokens.length === 0) return escapedText;
             const escaped = tokens
@@ -2697,11 +2645,7 @@
             return escapedText.replace(re, '<mark>$1</mark>');
         }
 
-        // Landing screen: friendly intro for customers + a browsable category grid
         function renderLanding() {
-            // aria-label must CONTAIN the visible label text (WCAG 2.5.3): each
-            // chip's visible words are the Title-case category name and the count,
-            // so we build the accessible name from those exact tokens.
             const chips = topCategories.map(c => {
                 const title = toTitle(c.name);
                 const label = `${title}, ${c.count} item${c.count === 1 ? '' : 's'}`;
@@ -2732,15 +2676,13 @@
             });
         }
 
-        // Convert an ALL-CAPS product type into readable Title Case for chips
         function toTitle(str) {
             return str.toLowerCase().replace(/\b([a-z])/g, (m, c) => c.toUpperCase());
         }
 
-        // ==================== PAN / ZOOM CONTROLLER ====================
         const panZoom = (() => {
-            const MIN_VIEW_W = 120;   // deepest zoom-in
-            const MAX_VIEW_W = 3000;  // furthest zoom-out
+            const MIN_VIEW_W = 120;
+            const MAX_VIEW_W = 3000;
             let svg = null;
             let home = { x: 0, y: 0, w: 800, h: 800 };
             let vb = { x: 0, y: 0, w: 800, h: 800 };
@@ -2766,7 +2708,7 @@
                 }
                 const start = { ...vb };
                 const t0 = performance.now();
-                const ease = t => 1 - Math.pow(1 - t, 3); // easeOutCubic
+                const ease = t => 1 - Math.pow(1 - t, 3);
 
                 function frame(now) {
                     const t = Math.min(1, (now - t0) / duration);
@@ -2814,17 +2756,11 @@
                 apply();
             }
 
-            // Smoothly frame a rect given in SVG user coordinates.
-            // Deliberately gentle: keeps most of the floor plan in view so the
-            // selection can be located relative to the whole room.
             function focusRect(x, y, w, h, padFactor = 1.6) {
                 const cx = x + w / 2;
                 const cy = y + h / 2;
                 let targetW = Math.max(w, h) * (1 + padFactor * 2);
-                // Never closer than ~75% of the full map (small selections),
-                // never further than ~110% of it (wide multi-location unions).
                 targetW = Math.min(Math.max(targetW, home.w * 0.75), home.w * 1.1, MAX_VIEW_W);
-                // Match container aspect ratio so the frame is stable
                 const aspect = svg.clientHeight / svg.clientWidth || 1;
                 const targetH = targetW * aspect;
                 animateTo({ x: cx - targetW / 2, y: cy - targetH / 2, w: targetW, h: targetH });
@@ -2863,7 +2799,6 @@
                 vb = { x, y, w, h };
                 apply();
 
-                // --- Mouse drag ---
                 let isMouseDown = false;
                 let lastX = 0, lastY = 0, downX = 0, downY = 0;
 
@@ -2887,22 +2822,19 @@
                     lastY = e.clientY;
                 });
 
-                // --- Wheel zoom (toward cursor) ---
                 svg.addEventListener('wheel', (e) => {
                     e.preventDefault();
                     const factor = 1 + ((e.deltaY > 0 ? 1 : -1) * 0.1);
                     zoomAt(e.clientX, e.clientY, factor);
                 }, { passive: false });
 
-                // --- Double-click zoom in ---
                 svg.addEventListener('dblclick', (e) => {
                     e.preventDefault();
                     zoomAt(e.clientX, e.clientY, 0.6);
                 });
 
-                // --- Touch: one-finger pan, two-finger pinch ---
-                let touchMode = null;       // 'pan' | 'pinch'
-                let lastTouch = null;       // {x, y}
+                let touchMode = null;
+                let lastTouch = null;
                 let lastPinchDist = 0;
                 let lastPinchMid = null;
 
@@ -2944,7 +2876,6 @@
 
                 svg.addEventListener('touchend', () => {
                     touchMode = null;
-                    // Let click handlers read isMapDragging first, then clear it
                     setTimeout(() => { isMapDragging = false; }, 50);
                 }, { passive: true });
             }
@@ -2952,7 +2883,6 @@
             return { init, zoomCenter, focusElements, reset };
         })();
 
-        // ==================== STARTUP ====================
         window.onload = () => {
             const svg = document.querySelector('#mapSvgContainer svg');
             if (svg) panZoom.init(svg);
@@ -2968,7 +2898,6 @@
                 `${activeShelves.size} LOCATIONS`;
         }
 
-        // ==================== MAP INTERACTIVITY ====================
         function setupMapInteractivity() {
             const svgContainer = document.querySelector('#mapSvgContainer svg');
             if (svgContainer) svgContainer.classList.add('main-map');
@@ -2990,7 +2919,6 @@
                         if (isMapDragging) return;
                         e.stopPropagation();
 
-                        // The Office is the contacts location, not an inventory shelf
                         if (logicalId === 'OFFICE') {
                             searchInput.value = '';
                             clearSearchBtn.style.display = 'none';
@@ -3015,9 +2943,6 @@
             });
 
             if (svgContainer) {
-                // Tapping empty map space only DESELECTS the current location — it
-                // no longer wipes the search. On a tablet, dismissing the on-screen
-                // keyboard with a tap must not throw away what was typed.
                 svgContainer.addEventListener('click', () => {
                     if (isMapDragging) return;
                     if (currentlyHighlighted.length) clearHighlight();
@@ -3025,7 +2950,6 @@
             }
         }
 
-        // ==================== SEARCH ====================
         searchInput.addEventListener('input', (e) => {
             const query = e.target.value.toLowerCase().trim();
             resultsList.innerHTML = '';
@@ -3044,7 +2968,6 @@
             const filtered = inventory.filter(item => {
                 const combinedText =
                     `${item.itemNumber.toLowerCase()} ${item.description.toLowerCase()} ${item.location.toLowerCase()}`;
-                // Item matches only if every typed word is found somewhere in its text
                 return searchTokens.every(token => combinedText.includes(token));
             });
 
@@ -3054,7 +2977,6 @@
             const countText = `${filtered.length} item${filtered.length === 1 ? '' : 's'}`;
             viewTitle.textContent = `Search Results (${countText})`;
 
-            // A new query invalidates any highlight from the previous one
             clearHighlight();
 
             if (filtered.length === 0) {
@@ -3079,7 +3001,6 @@
             announce(`${countText} for ${e.target.value.trim()}. Press Enter to highlight every matching location, or use the arrow keys to review results.`);
         });
 
-        // Enter in the search box highlights every matching location at once
         searchInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -3089,8 +3010,6 @@
 
         mapAllBtn.addEventListener('click', mapAllCurrent);
 
-        // Keyboard shortcuts: "/" focuses search, Escape clears everything,
-        // Arrow keys move through the result rows for keyboard/tablet users.
         window.addEventListener('keydown', (e) => {
             if (e.key === '/' && document.activeElement !== searchInput) {
                 e.preventDefault();
@@ -3110,7 +3029,6 @@
                 const active = document.activeElement;
                 const inList = active && active.classList.contains('result-item');
 
-                // From the search box, ArrowDown drops focus into the first row
                 if (active === searchInput && e.key === 'ArrowDown') {
                     e.preventDefault();
                     rows[0].focus();
@@ -3134,7 +3052,6 @@
             searchInput.focus();
         });
 
-        // ==================== CATEGORY BROWSING ====================
         function showCategory(catName) {
             clearHighlight();
             searchInput.value = '';
@@ -3162,7 +3079,6 @@
             resultsList.scrollTop = 0;
         }
 
-        // ---- "Map all": highlight every location behind the current list ----
         function chipNameFor(logicalId) {
             if (nonShelfLabels[logicalId]) return `${logicalId} - ${nonShelfLabels[logicalId]}`;
             return `Shelf ${logicalId}`;
@@ -3187,7 +3103,6 @@
 
         listBackBar.addEventListener('click', renderLanding_reset);
 
-        // Return to the category landing without wiping the whole view chrome
         function renderLanding_reset() {
             clearHighlight();
             cameFromCategory = null;
@@ -3203,10 +3118,6 @@
             announce('Browsing categories.');
         }
 
-        // ==================== DISPLAY LOGIC ====================
-        // Contacts: highlight the Office on the map and list the points of contact.
-        // Reachable two ways (like the POS stations): the sidebar Contacts button
-        // and clicking the Office on the map.
         function openContacts() {
             const OFFICE = 'OFFICE';
             cameFromCategory = null;
@@ -3227,8 +3138,6 @@
             const pinIcon = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>`;
             const phoneIcon = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>`;
 
-            // Every field is optional so an edited CONTACTS entry can never crash
-            // the panel; each line carries a screen-reader label for context.
             const cards = CONTACTS.map(c => {
                 const lines = [];
                 if (c.email) {
@@ -3282,7 +3191,6 @@
             if (shelfItems.length === 0) {
                 const fixedLabel = fixedLocationDescriptions[logicalId];
                 if (fixedLabel) {
-                    // Fixed stockroom feature: show what this location is
                     viewTitle.textContent = `Location: ${displayName}`;
                     resultsList.innerHTML = `
                         <div class="empty-state">
@@ -3307,14 +3215,11 @@
             announce(`${displayName}, ${countText}.`);
         }
 
-        // interactive: rows highlight the map on click/Enter. tokens: search terms to <mark>.
         function renderList(items, interactive, tokens) {
             tokens = tokens || [];
             resultsList.innerHTML = '';
             const renderItems = items.slice(0, MAX_RENDERED_RESULTS);
 
-            // Real <ul> of <li> listitems; each interactive row is a native
-            // <button> inside its <li> (correct list semantics + keyboard support)
             const ul = document.createElement('ul');
             ul.className = 'result-listing';
             ul.setAttribute('aria-label', interactive ? 'Results — select to show on the map' : 'Items at this location');
@@ -3352,10 +3257,7 @@
                     btn.setAttribute('aria-label',
                         `${item.description}. Item ${item.itemNumber}. Location ${displayLoc}. Show on map.`);
 
-                    // Native <button> handles Enter/Space and click for us
                     btn.addEventListener('click', () => {
-                        // Highlight the map first: clearHighlight() inside it also
-                        // clears the previous active row, so set ours afterwards.
                         if (logicalId) {
                             let chipName = `Shelf ${logicalId}`;
                             if (nonShelfLabels[logicalId]) chipName = `${logicalId} - ${nonShelfLabels[logicalId]}`;
@@ -3366,7 +3268,6 @@
                     });
                     li.appendChild(btn);
                 } else {
-                    // Shelf-contents view: static rows (the title names the shelf)
                     const div = document.createElement('div');
                     div.className = 'result-item result-item--static';
                     div.innerHTML = rowInner;
@@ -3389,8 +3290,6 @@
             }
         }
 
-        // ==================== CLONE-LAYER HIGHLIGHTING ====================
-        // Single-location highlight is just the multi version with one id
         function highlightLocationOnMap(logicalId, chipName) {
             highlightLocationsOnMap([logicalId], chipName);
         }
@@ -3399,7 +3298,6 @@
             clearHighlight();
             const originalSvg = document.querySelector('#mapSvgContainer > svg.main-map');
 
-            // Collect every element across all requested locations
             const elementsToHighlight = [];
             logicalIds.forEach(logicalId => {
                 const els = svgMapElements.get(logicalId);
@@ -3415,16 +3313,12 @@
             });
 
             if (elementsToHighlight.length > 0 && originalSvg) {
-                // Dim the base map
                 originalSvg.classList.add('map-is-active');
 
-                // Clone the map as a crisp overlay showing only the highlight
                 highlightOverlaySvg = originalSvg.cloneNode(true);
                 highlightOverlaySvg.classList.remove('main-map', 'map-is-active');
                 highlightOverlaySvg.classList.add('highlight-layer');
 
-                // The clone is purely visual — remove interactive classes so it
-                // can never intercept clicks meant for shelves underneath
                 highlightOverlaySvg.querySelectorAll('.clickable-shelf').forEach(el => {
                     el.classList.remove('clickable-shelf');
                 });
@@ -3438,10 +3332,8 @@
 
                 document.getElementById('mapSvgContainer').appendChild(highlightOverlaySvg);
 
-                // Glide the camera to frame the selection
                 panZoom.focusElements(elementsToHighlight);
 
-                // Show the floating location chip
                 if (chipName) {
                     locationChipText.textContent = chipName;
                     locationChip.style.display = 'flex';
@@ -3471,7 +3363,6 @@
             locationChip.style.display = 'none';
         }
 
-        // ==================== RESET ====================
         function resetView() {
             searchInput.value = '';
             clearSearchBtn.style.display = 'none';
@@ -3490,7 +3381,6 @@
         resetBtn.addEventListener('click', resetView);
         document.getElementById('locationChipClear').addEventListener('click', resetView);
 
-        // ---- Zoom control buttons ----
         document.getElementById('zoomInBtn').addEventListener('click', () => panZoom.zoomCenter(0.8));
         document.getElementById('zoomOutBtn').addEventListener('click', () => panZoom.zoomCenter(1.25));
         document.getElementById('zoomFitBtn').addEventListener('click', () => panZoom.reset());
