@@ -3385,5 +3385,39 @@
         document.getElementById('zoomOutBtn').addEventListener('click', () => panZoom.zoomCenter(1.25));
         document.getElementById('zoomFitBtn').addEventListener('click', () => panZoom.reset());
     </script>
+
+    <script>
+/* Keep the screen awake (tablet kiosk use) via the Screen Wake Lock API.
+   The lock is released by the browser whenever the tab is hidden, so it is
+   re-requested on return. Some browsers (e.g. Safari) only grant it after
+   a user gesture, so we also retry on the first touch/click/key press. */
+(function () {
+    if (!('wakeLock' in navigator)) return;
+    var sentinel = null, pending = false;
+
+    function acquire() {
+        if (sentinel || pending || document.visibilityState !== 'visible') return;
+        pending = true;
+        navigator.wakeLock.request('screen').then(function (lock) {
+            sentinel = lock;
+            pending = false;
+            lock.addEventListener('release', function () {
+                if (sentinel === lock) sentinel = null;
+            });
+        }).catch(function () {
+            pending = false; /* denied (low battery, no gesture yet, etc.) - retry later */
+        });
+    }
+
+    document.addEventListener('visibilitychange', acquire);
+    window.addEventListener('pageshow', acquire);
+    window.addEventListener('focus', acquire);
+    ['pointerdown', 'touchstart', 'keydown', 'click'].forEach(function (evt) {
+        document.addEventListener(evt, acquire, { passive: true });
+    });
+    acquire();
+    })();
+    </script>
+
 </body>
 </html>
